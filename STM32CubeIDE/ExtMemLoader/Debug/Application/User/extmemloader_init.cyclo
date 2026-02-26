@@ -1,0 +1,4 @@
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/ExtMemLoader/Src/extmemloader_init.c:286:6:Error_Handler	1
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/ExtMemLoader/Src/extmemloader_init.c:161:6:SystemClock_Config	3
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/ExtMemLoader/Src/extmemloader_init.c:246:13:MX_XSPI2_Init	1
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/ExtMemLoader/Src/extmemloader_init.c:76:10:extmemloader_Init	5

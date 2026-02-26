@@ -1,0 +1,4 @@
+../../../Appli/Inc/partition_stm32n657xx.h:686:22:TZ_SAU_Setup	1
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/Appli/Src/system_stm32n6xx_s.c:176:6:SystemInit	1
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/Appli/Src/system_stm32n6xx_s.c:260:6:SystemCoreClockUpdate	21
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/Appli/Src/system_stm32n6xx_s.c:413:24:SECURE_SystemCoreClockUpdate	1

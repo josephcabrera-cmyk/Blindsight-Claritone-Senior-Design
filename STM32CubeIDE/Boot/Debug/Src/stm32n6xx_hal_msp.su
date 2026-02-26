@@ -1,0 +1,7 @@
+../../../../../../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_bus.h:1407:22:LL_AHB4_GRP1_EnableClock	24	static
+../../../../../../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_bus.h:1755:22:LL_AHB5_GRP1_EnableClock	24	static
+../../../../../../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_bus.h:1891:22:LL_AHB5_GRP1_DisableClock	16	static
+../../../../../../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_bus.h:3495:22:LL_APB4_GRP2_EnableClock	24	static
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/FSBL/Src/stm32n6xx_hal_msp.c:64:6:HAL_MspInit	8	static
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/FSBL/Src/stm32n6xx_hal_msp.c:86:6:HAL_XSPI_MspInit	456	static
+C:/Users/zebes/Blindsight_Projects/STM32Cube_FW_N6_V1.3.0/Projects/NUCLEO-N657X0-Q/Templates/Template_FSBL_XIP/FSBL/Src/stm32n6xx_hal_msp.c:212:6:HAL_XSPI_MspDeInit	16	static
