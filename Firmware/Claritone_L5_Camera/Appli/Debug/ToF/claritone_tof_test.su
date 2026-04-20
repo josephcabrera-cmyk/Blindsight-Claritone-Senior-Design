@@ -1,4 +1,0 @@
-../ToF/claritone_tof_test.c:26:13:dbg_print	16	static
-../ToF/claritone_tof_test.c:38:13:sensor_power_on	8	static
-../ToF/claritone_tof_test.c:54:9:claritone_tof_test_init	32	static
-../ToF/claritone_tof_test.c:124:6:claritone_tof_test_ranging_loop	1392	static

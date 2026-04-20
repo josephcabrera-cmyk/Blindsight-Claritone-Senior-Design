@@ -47,6 +47,7 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -82,6 +83,7 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
+  MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -136,6 +138,9 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 
+  /* Wait HSE stabilization time before its selection as PLL source. */
+  HAL_Delay(HSE_STARTUP_TIMEOUT);
+
   /** Get current CPU/System buses clocks configuration and if necessary switch
  to intermediate HSI clock to ensure target clock can be set
   */
@@ -156,8 +161,15 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_NONE;
-  RCC_OscInitStruct.PLL1.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL1.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL1.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL1.PLLM = 1;
+  RCC_OscInitStruct.PLL1.PLLN = 32;
+  RCC_OscInitStruct.PLL1.PLLFractional = 0;
+  RCC_OscInitStruct.PLL1.PLLP1 = 1;
+  RCC_OscInitStruct.PLL1.PLLP2 = 1;
   RCC_OscInitStruct.PLL2.PLLState = RCC_PLL_NONE;
   RCC_OscInitStruct.PLL3.PLLState = RCC_PLL_NONE;
   RCC_OscInitStruct.PLL4.PLLState = RCC_PLL_NONE;
@@ -172,17 +184,39 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1
                               |RCC_CLOCKTYPE_PCLK2|RCC_CLOCKTYPE_PCLK5
                               |RCC_CLOCKTYPE_PCLK4;
-  RCC_ClkInitStruct.CPUCLKSource = RCC_CPUCLKSOURCE_HSI;
+  RCC_ClkInitStruct.CPUCLKSource = RCC_CPUCLKSOURCE_IC1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_APB1_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV1;
   RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV1;
   RCC_ClkInitStruct.APB5CLKDivider = RCC_APB5_DIV1;
+  RCC_ClkInitStruct.IC1Selection.ClockSelection = RCC_ICCLKSOURCE_PLL1;
+  RCC_ClkInitStruct.IC1Selection.ClockDivider = 3;
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+
+  /* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
