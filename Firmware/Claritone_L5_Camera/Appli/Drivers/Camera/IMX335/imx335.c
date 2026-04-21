@@ -39,30 +39,6 @@
   */
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
-/**
-  * @}
-  */
-
-/** @defgroup IMX335_Private_Variables Private Variables
-  * @{
-  */
-IMX335_CAMERA_Drv_t   IMX335_CAMERA_Driver =
-{
-  .Init = IMX335_Init,
-  .DeInit = IMX335_DeInit,
-  .ReadID = IMX335_ReadID,
-  .GetCapabilities = IMX335_GetCapabilities,
-  .SetGain = IMX335_SetGain,
-  .SetExposure = IMX335_SetExposure,
-  .SetFrequency = IMX335_SetFrequency,
-  .MirrorFlipConfig = IMX335_MirrorFlipConfig,
-  .GetSensorInfo = IMX335_GetSensorInfo,
-  .SetTestPattern = IMX335_SetTestPattern
-};
-/**
-  * @}
-  */
-
 /** @defgroup IMX335_Private_Constants Private Constants
   * @{
   */
@@ -454,7 +430,6 @@ int32_t IMX335_RegisterBusIO(IMX335_Object_t *pObj, IMX335_IO_t *pIO)
 int32_t IMX335_Init(IMX335_Object_t *pObj, uint32_t Resolution, uint32_t PixelFormat)
 {
   int32_t ret = IMX335_OK;
-  uint8_t tmp;
 
   if(pObj->IsInitialized == 0U)
   {
@@ -480,21 +455,33 @@ int32_t IMX335_Init(IMX335_Object_t *pObj, uint32_t Resolution, uint32_t PixelFo
       }
       else
       {
-        /* Start streaming */
-        tmp = IMX335_MODE_STREAMING;
-        if(imx335_write_reg(&pObj->Ctx, IMX335_REG_MODE_SELECT, &tmp, 1) != IMX335_OK)
-        {
-          ret = IMX335_ERROR;
-        }
-        else
-        {
-          IMX335_Delay(pObj, 20);
-          pObj->IsInitialized = 1U;
-        }
+        pObj->IsInitialized = 1U;
       }
     }
   }
 
+  return ret;
+}
+
+/**
+  * @brief  Initializes the IMX335 CAMERA component.
+  * @param  pObj  pointer to component object
+  * @param  Resolution  Camera resolution
+  * @param  PixelFormat pixel format to be configured
+  * @retval Component status
+  */
+int32_t IMX335_Start(IMX335_Object_t *pObj)
+{
+  uint8_t tmp;
+  int32_t ret = IMX335_OK;
+  /* Start streaming */
+  tmp = IMX335_MODE_STREAMING;
+  ret = imx335_write_reg(&pObj->Ctx, IMX335_REG_MODE_SELECT, &tmp, 1);
+  if (ret != IMX335_OK)
+  {
+    return IMX335_ERROR;
+  }
+  IMX335_Delay(pObj, 20);
   return ret;
 }
 
@@ -581,40 +568,6 @@ int32_t IMX335_GetCapabilities(IMX335_Object_t *pObj, IMX335_Capabilities_t *Cap
 }
 
 /**
-  * @brief  Get the IMX335 Sensor info.
-  * @param  pObj   pointer to component object
-  * @param  Info   pointer to sensor info
-  * @retval Component status
-  */
-int32_t IMX335_GetSensorInfo(IMX335_Object_t *pObj, IMX335_SensorInfo_t *Info)
-{
-  if ((!pObj) || (Info == NULL))
-  {
-    return IMX335_ERROR;
-  }
-
-  if (sizeof(Info->name) >= strlen(IMX335_NAME) + 1)
-  {
-    strcpy(Info->name, IMX335_NAME);
-  }
-  else
-  {
-    return IMX335_ERROR;
-  }
-
-  Info->bayer_pattern = IMX335_BAYER_PATTERN;
-  Info->color_depth = IMX335_COLOR_DEPTH;
-  Info->width = IMX335_WIDTH;
-  Info->height = IMX335_HEIGHT;
-  Info->gain_min = IMX335_GAIN_MIN;
-  Info->gain_max = IMX335_GAIN_MAX;
-  Info->exposure_min = IMX335_EXPOSURE_MIN;
-  Info->exposure_max = IMX335_EXPOSURE_MAX;
-
-  return IMX335_OK;
-}
-
-/**
   * @brief  Set the gain
   * @param  pObj  pointer to component object
   * @param  Gain Gain in mdB
@@ -678,7 +631,7 @@ int32_t IMX335_SetExposure(IMX335_Object_t *pObj, int32_t exposure)
   }
   else
   {
-    shutter = ( vmax - (exposure /((uint32_t) IMX335_1H_PERIOD_USEC)));
+    shutter = (uint32_t) (vmax - (exposure / IMX335_1H_PERIOD_USEC));
 
     if (shutter < IMX335_SHUTTER_MIN)
     {

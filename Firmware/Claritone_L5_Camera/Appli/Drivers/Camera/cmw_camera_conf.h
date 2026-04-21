@@ -27,11 +27,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #if defined (STM32N657xx)
 #include "stm32n6xx_hal.h"
-#ifdef STM32N6570_NUCLEO_REV
-#include "stm32n6xx_nucleo_bus.h"
-#else
-#include "stm32n6570_discovery_bus.h"
-#endif
+#include "main.h"   /* Claritone: provides hi2c2 handle declaration */
 #else
 #error Add header files for your specific board
 #endif
@@ -42,12 +38,7 @@ extern "C" {
 /**
   * @brief This is the list of modules to be used in the HAL driver
   */
-#define USE_VD66GY_SENSOR
 #define USE_IMX335_SENSOR
-#define USE_OV5640_SENSOR
-#define USE_VD55G1_SENSOR
-#define USE_VD65G4_SENSOR
-#define USE_VD1943_SENSOR
 
 
 #ifdef __cplusplus

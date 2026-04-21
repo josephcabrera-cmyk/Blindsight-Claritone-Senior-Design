@@ -183,7 +183,7 @@ static int32_t CMW_IMX335_GetSensorInfo(void *io_ctx, ISP_SensorInfoTypeDef *inf
   info->height = IMX335_HEIGHT;
   info->gain_min = IMX335_GAIN_MIN;
   info->gain_max = IMX335_GAIN_MAX;
-  info->again_max = IMX335_AGAIN_MAX;
+  info->again_max = IMX335_GAIN_MAX;
   info->exposure_min = IMX335_EXPOSURE_MIN;
   info->exposure_max = IMX335_EXPOSURE_MAX;
 

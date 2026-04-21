@@ -94,6 +94,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  HAL_GPIO_TogglePin(GPIOD, SCROLL_1_Pin);
+	  HAL_Delay(500);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -115,6 +117,12 @@ int main(void)
 
   /* set all required IPs as secure privileged */
   __HAL_RCC_RIFSC_CLK_ENABLE();
+
+  /*RIMC configuration*/
+  RIMC_MasterConfig_t RIMC_master = {0};
+  RIMC_master.MasterCID = RIF_CID_0;
+  RIMC_master.SecPriv = RIF_ATTRIBUTE_SEC | RIF_ATTRIBUTE_NPRIV;
+  HAL_RIF_RIMC_ConfigMasterAttributes(RIF_MASTER_INDEX_DCMIPP, &RIMC_master);
 
   /* RIF-Aware IPs Config */
 

@@ -85,50 +85,8 @@ typedef struct
   uint32_t Config_ExposureMode;
   uint32_t Config_SensorInfo;
   uint32_t Config_TestPattern;
-  uint32_t Config_ColorEffect;
 } IMX335_Capabilities_t;
 
-#define IMX335_SENSOR_INFO_MAX_LENGTH      (32U)
-
-typedef struct
-{
-  char name[IMX335_SENSOR_INFO_MAX_LENGTH];
-  uint8_t bayer_pattern;
-  uint8_t color_depth;
-  uint32_t width;
-  uint32_t height;
-  uint32_t gain_min;
-  uint32_t gain_max;
-  uint32_t exposure_min;
-  uint32_t exposure_max;
-} IMX335_SensorInfo_t;
-
-typedef struct
-{
-  int32_t  (*Init              )(IMX335_Object_t*, uint32_t, uint32_t);
-  int32_t  (*DeInit            )(IMX335_Object_t*);
-  int32_t  (*ReadID            )(IMX335_Object_t*, uint32_t*);
-  int32_t  (*GetCapabilities   )(IMX335_Object_t*, IMX335_Capabilities_t*);
-  int32_t  (*SetLightMode      )(IMX335_Object_t*, uint32_t);
-  int32_t  (*SetColorEffect    )(IMX335_Object_t*, uint32_t);
-  int32_t  (*SetBrightness     )(IMX335_Object_t*, int32_t);
-  int32_t  (*SetSaturation     )(IMX335_Object_t*, int32_t);
-  int32_t  (*SetContrast       )(IMX335_Object_t*, int32_t);
-  int32_t  (*SetHueDegree      )(IMX335_Object_t*, int32_t);
-  int32_t  (*MirrorFlipConfig  )(IMX335_Object_t*, uint32_t);
-  int32_t  (*ZoomConfig        )(IMX335_Object_t*, uint32_t);
-  int32_t  (*SetResolution     )(IMX335_Object_t*, uint32_t);
-  int32_t  (*GetResolution     )(IMX335_Object_t*, uint32_t*);
-  int32_t  (*SetPixelFormat    )(IMX335_Object_t*, uint32_t);
-  int32_t  (*GetPixelFormat    )(IMX335_Object_t*, uint32_t*);
-  int32_t  (*NightModeConfig   )(IMX335_Object_t*, uint32_t);
-  int32_t  (*SetFrequency      )(IMX335_Object_t*, int32_t);
-  int32_t  (*SetGain           )(IMX335_Object_t*, int32_t);
-  int32_t  (*SetExposure       )(IMX335_Object_t*, int32_t);
-  int32_t  (*SetExposureMode   )(IMX335_Object_t*, int32_t);
-  int32_t  (*GetSensorInfo     )(IMX335_Object_t *, IMX335_SensorInfo_t *);
-  int32_t  (*SetTestPattern    )(IMX335_Object_t*, int32_t);
-}IMX335_CAMERA_Drv_t;
 /**
   * @}
   */
@@ -169,6 +127,7 @@ typedef struct
   */
 int32_t IMX335_RegisterBusIO(IMX335_Object_t *pObj, IMX335_IO_t *pIO);
 int32_t IMX335_Init(IMX335_Object_t *pObj, uint32_t Resolution, uint32_t PixelFormat);
+int32_t IMX335_Start(IMX335_Object_t *pObj);
 int32_t IMX335_DeInit(IMX335_Object_t *pObj);
 int32_t IMX335_ReadID(IMX335_Object_t *pObj, uint32_t *Id);
 int32_t IMX335_GetCapabilities(IMX335_Object_t *pObj, IMX335_Capabilities_t *Capabilities);
@@ -177,11 +136,8 @@ int32_t IMX335_SetExposure(IMX335_Object_t *pObj, int32_t exposure);
 int32_t IMX335_SetFrequency(IMX335_Object_t *pObj, int32_t frequency);
 int32_t IMX335_SetFramerate(IMX335_Object_t *pObj, int32_t framerate);
 int32_t IMX335_MirrorFlipConfig(IMX335_Object_t *pObj, uint32_t Config);
-int32_t IMX335_GetSensorInfo(IMX335_Object_t *pObj, IMX335_SensorInfo_t *Info);
 int32_t IMX335_SetTestPattern(IMX335_Object_t *pObj, int32_t mode);
 
-/* CAMERA driver structure */
-extern IMX335_CAMERA_Drv_t   IMX335_CAMERA_Driver;
 /**
   * @}
   */
