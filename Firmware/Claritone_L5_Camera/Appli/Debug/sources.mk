@@ -25,7 +25,7 @@ OBJCOPY_BIN :=
 SUBDIRS := \
 Core/Src \
 Core/Startup \
-Drivers/STM32N6xx_HAL_Driver \
 Drivers/VL53L7CX_ULD/Src \
+STM32N6xx_HAL_Driver/Src \
 ToF \
 

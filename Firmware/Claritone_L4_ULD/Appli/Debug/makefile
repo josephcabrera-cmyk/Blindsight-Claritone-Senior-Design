@@ -65,8 +65,8 @@ all: main-build
 main-build: Claritone_L4_ULD_Appli.elf secondary-outputs
 
 # Tool invocations
-Claritone_L4_ULD_Appli.elf Claritone_L4_ULD_Appli.map: $(OBJS) $(USER_OBJS) C:\Users\Thepr\STM32Projects\Claritone_L4_ULD\Appli\STM32N657X0HXQ_LRUN.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Claritone_L4_ULD_Appli.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m55 -T"C:\Users\Thepr\STM32Projects\Claritone_L4_ULD\Appli\STM32N657X0HXQ_LRUN.ld" --specs=nosys.specs -Wl,-Map="Claritone_L4_ULD_Appli.map" -Wl,--gc-sections -static -Wl,--cmse-implib -Wl,--out-implib=./secure_nsclib.o --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Claritone_L4_ULD_Appli.elf Claritone_L4_ULD_Appli.map: $(OBJS) $(USER_OBJS) C:\Users\Thepr\STM32Projects\Blindsight-Claritone-Senior-Design\Firmware\Claritone_L4_ULD\Appli\STM32N657X0HXQ_LRUN.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Claritone_L4_ULD_Appli.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m55 -T"C:\Users\Thepr\STM32Projects\Blindsight-Claritone-Senior-Design\Firmware\Claritone_L4_ULD\Appli\STM32N657X0HXQ_LRUN.ld" --specs=nosys.specs -Wl,-Map="Claritone_L4_ULD_Appli.map" -Wl,--gc-sections -static -Wl,--cmse-implib -Wl,--out-implib=./secure_nsclib.o --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

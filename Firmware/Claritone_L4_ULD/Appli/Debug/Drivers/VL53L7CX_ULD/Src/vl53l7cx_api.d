@@ -1,7 +1,7 @@
 Drivers/VL53L7CX_ULD/Src/vl53l7cx_api.o: \
  ../Drivers/VL53L7CX_ULD/Src/vl53l7cx_api.c \
- C:/Users/Thepr/STM32Projects/Claritone_L4_ULD/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_api.h \
- C:/Users/Thepr/STM32Projects/Claritone_L4_ULD/Appli/ToF/platform.h \
+ C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L4_ULD/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_api.h \
+ C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L4_ULD/Appli/ToF/platform.h \
  ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal.h \
  ../Core/Inc/stm32n6xx_hal_conf.h \
  ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_rcc.h \
@@ -31,9 +31,9 @@ Drivers/VL53L7CX_ULD/Src/vl53l7cx_api.o: \
  ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_pwr_ex.h \
  ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_uart.h \
  ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_uart_ex.h \
- C:/Users/Thepr/STM32Projects/Claritone_L4_ULD/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_buffers.h
-C:/Users/Thepr/STM32Projects/Claritone_L4_ULD/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_api.h:
-C:/Users/Thepr/STM32Projects/Claritone_L4_ULD/Appli/ToF/platform.h:
+ C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L4_ULD/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_buffers.h
+C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L4_ULD/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_api.h:
+C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L4_ULD/Appli/ToF/platform.h:
 ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal.h:
 ../Core/Inc/stm32n6xx_hal_conf.h:
 ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_rcc.h:
@@ -63,4 +63,4 @@ C:/Users/Thepr/STM32Projects/Claritone_L4_ULD/Appli/ToF/platform.h:
 ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_pwr_ex.h:
 ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_uart.h:
 ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_uart_ex.h:
-C:/Users/Thepr/STM32Projects/Claritone_L4_ULD/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_buffers.h:
+C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L4_ULD/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_buffers.h:
