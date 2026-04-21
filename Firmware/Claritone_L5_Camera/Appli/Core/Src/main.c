@@ -53,7 +53,7 @@
 /* Private function prototypes -----------------------------------------------*/
 static void SystemIsolation_Config(void);
 /* USER CODE BEGIN PFP */
-
+void SystemClock_Config(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -177,7 +177,7 @@ int main(void)
   /* USER CODE END Init */
 
   /* USER CODE BEGIN SysInit */
-
+  SystemClock_Config();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -259,6 +259,48 @@ int main(void)
 }
 
 /* USER CODE BEGIN 4 */
+  void SystemClock_Config(void)
+  {
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+    /* Enable HSE + PLL1 from HSE */
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+    RCC_OscInitStruct.PLL1.PLLState = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL1.PLLSource = RCC_PLLSOURCE_HSE;
+    RCC_OscInitStruct.PLL1.PLLM = 1;
+    RCC_OscInitStruct.PLL1.PLLN = 32;
+    RCC_OscInitStruct.PLL1.PLLFractional = 0;
+    RCC_OscInitStruct.PLL1.PLLP1 = 1;
+    RCC_OscInitStruct.PLL1.PLLP2 = 1;
+    RCC_OscInitStruct.PLL2.PLLState = RCC_PLL_NONE;
+    RCC_OscInitStruct.PLL3.PLLState = RCC_PLL_NONE;
+    RCC_OscInitStruct.PLL4.PLLState = RCC_PLL_NONE;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* Switch CPU to IC1 (fed by PLL1), IC1 divides PLL1 by 3 -> 266.67 MHz */
+    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_CPUCLK|RCC_CLOCKTYPE_HCLK
+                                |RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1
+                                |RCC_CLOCKTYPE_PCLK2|RCC_CLOCKTYPE_PCLK5
+                                |RCC_CLOCKTYPE_PCLK4;
+    RCC_ClkInitStruct.CPUCLKSource = RCC_CPUCLKSOURCE_IC1;
+    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+    RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV2;
+    RCC_ClkInitStruct.APB1CLKDivider = RCC_APB1_DIV1;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV1;
+    RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV1;
+    RCC_ClkInitStruct.APB5CLKDivider = RCC_APB5_DIV1;
+    RCC_ClkInitStruct.IC1Selection.ClockSelection = RCC_ICCLKSOURCE_PLL1;
+    RCC_ClkInitStruct.IC1Selection.ClockDivider = 3;
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+  }
 
 /* USER CODE END 4 */
 
