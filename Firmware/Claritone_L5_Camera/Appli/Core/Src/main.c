@@ -21,7 +21,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
+#include <stdio.h>
+#include "i2c_bb.h"
+#include "claritone_tof_test.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,7 +60,104 @@ static void SystemIsolation_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+static void i2c_bb_timing_diagnostic(void)
+{
+    char buf[128];
+    int len;
 
+    /* Baseline: SystemCoreClock value */
+    len = snprintf(buf, sizeof(buf),
+        "\r\n--- I2C bit-bang timing diagnostic ---\r\n"
+        "SystemCoreClock = %lu Hz\r\n",
+        (unsigned long)SystemCoreClock);
+    HAL_UART_Transmit(&huart4, (const uint8_t *)buf, len, HAL_MAX_DELAY);
+
+    /* Ensure DWT is ticking */
+    if (!(DWT->CTRL & DWT_CTRL_CYCCNTENA_Msk)) {
+        len = snprintf(buf, sizeof(buf), "WARNING: DWT not enabled; enabling now\r\n");
+        HAL_UART_Transmit(&huart4, (const uint8_t *)buf, len, HAL_MAX_DELAY);
+        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+        DWT->CYCCNT = 0;
+        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+    }
+
+    /* --- Measurement 1: cost of dwt_delay_us(1) --- */
+    {
+        extern void i2c_bb_init(void);   /* make sure DWT init ran */
+        i2c_bb_init();
+
+        uint32_t start = DWT->CYCCNT;
+        for (int i = 0; i < 1000; i++) {
+            /* Call the exact same delay used in the bit-bang loop.
+             * We can't call the static function directly, so we have to
+             * move this measurement into i2c_bb.c. For now, do a small
+             * proxy: bodywise identical code. */
+            uint32_t t0 = DWT->CYCCNT;
+            uint32_t target = 1 * (SystemCoreClock / 1000000u);
+            while ((DWT->CYCCNT - t0) < target) { /* spin */ }
+        }
+        uint32_t end = DWT->CYCCNT;
+        uint32_t cycles_per_call = (end - start) / 1000u;
+
+        len = snprintf(buf, sizeof(buf),
+            "dwt_delay_us(1) measured: %lu cycles/call = %lu ns\r\n",
+            (unsigned long)cycles_per_call,
+            (unsigned long)((cycles_per_call * 1000u) / (SystemCoreClock / 1000000u)));
+        HAL_UART_Transmit(&huart4, (const uint8_t *)buf, len, HAL_MAX_DELAY);
+    }
+
+    /* --- Measurement 2: cost of one i2c_bb_write_byte --- */
+    /* This measures a REAL write-byte call, including 18 half-bit delays
+     * (8 data bits × 2 half-bits + 1 ACK × 2 half-bits).
+     * The sensor NACKs because there's no active transaction, but timing is
+     * the same. */
+    {
+        uint32_t start = DWT->CYCCNT;
+        i2c_bb_start();
+        for (int i = 0; i < 100; i++) {
+            (void)i2c_bb_write_byte(0x00);
+        }
+        i2c_bb_stop();
+        uint32_t end = DWT->CYCCNT;
+        uint32_t cycles_per_byte = (end - start) / 100u;
+
+        len = snprintf(buf, sizeof(buf),
+            "i2c_bb_write_byte measured: %lu cycles/byte = %lu us\r\n"
+            "  effective bit-rate: %lu bits/sec (%lu kHz)\r\n",
+            (unsigned long)cycles_per_byte,
+            (unsigned long)(cycles_per_byte / (SystemCoreClock / 1000000u)),
+            /* 9 bits per byte (8 data + 1 ACK) */
+            (unsigned long)(9ul * (SystemCoreClock / cycles_per_byte)),
+            (unsigned long)((9ul * (SystemCoreClock / cycles_per_byte)) / 1000u));
+        HAL_UART_Transmit(&huart4, (const uint8_t *)buf, len, HAL_MAX_DELAY);
+    }
+
+    /* --- Projection: how long to transmit 85 KB at this rate? --- */
+    {
+        extern uint32_t SystemCoreClock;
+        /* From measurement 2, recompute: */
+        uint32_t start = DWT->CYCCNT;
+        i2c_bb_start();
+        for (int i = 0; i < 100; i++) {
+            (void)i2c_bb_write_byte(0x00);
+        }
+        i2c_bb_stop();
+        uint32_t end = DWT->CYCCNT;
+        uint32_t cycles_per_byte = (end - start) / 100u;
+
+        /* 85 KB of firmware = ~85000 bytes, but each ULD WrMulti call has
+         * ~3 bytes of addressing overhead (address + 2-byte index).
+         * Assume 85000 + overhead ≈ 86000 bytes total. */
+        uint32_t total_cycles = 86000ul * cycles_per_byte;
+        uint32_t total_ms = total_cycles / (SystemCoreClock / 1000u);
+
+        len = snprintf(buf, sizeof(buf),
+            "Projected 85 KB transfer: %lu ms\r\n"
+            "--- end diagnostic ---\r\n\r\n",
+            (unsigned long)total_ms);
+        HAL_UART_Transmit(&huart4, (const uint8_t *)buf, len, HAL_MAX_DELAY);
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -92,10 +192,31 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	  HAL_GPIO_TogglePin(GPIOD, SCROLL_1_Pin);
-	  HAL_Delay(500);
+  /* Banner */
+   const char *banner = "\r\n=== L5.0: ToF test at 266MHz HSE ===\r\n";
+   HAL_UART_Transmit(&huart4, (const uint8_t *)banner, strlen(banner), HAL_MAX_DELAY);
+
+   /* Run the bit-bang timing diagnostic FIRST - this is non-blocking
+    * and tells us if the NOP count is still in range at the new clock */
+   i2c_bb_timing_diagnostic();
+
+   /* Initialize and configure the sensor */
+   if (claritone_tof_test_init() != 0) {
+       const char *fail = "ToF init failed. Halting.\r\n";
+       while (1) {
+           HAL_UART_Transmit(&huart4, (const uint8_t *)fail, strlen(fail), HAL_MAX_DELAY);
+           HAL_GPIO_TogglePin(SCROLL_1_GPIO_Port, SCROLL_1_Pin);
+           HAL_Delay(1000);
+       }
+   }
+
+   /* Never returns */
+   claritone_tof_test_ranging_loop();
+
+   /* Should never reach here */
+   while (1)
+   {
+       HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

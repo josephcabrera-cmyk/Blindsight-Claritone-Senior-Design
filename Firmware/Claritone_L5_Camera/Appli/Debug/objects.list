@@ -1,3 +1,4 @@
+"./Core/Src/i2c_bb.o"
 "./Core/Src/main.o"
 "./Core/Src/secure_nsc.o"
 "./Core/Src/stm32n6xx_hal_msp.o"
@@ -19,3 +20,6 @@
 "./Drivers/STM32N6xx_HAL_Driver/stm32n6xx_hal_rif.o"
 "./Drivers/STM32N6xx_HAL_Driver/stm32n6xx_hal_uart.o"
 "./Drivers/STM32N6xx_HAL_Driver/stm32n6xx_hal_uart_ex.o"
+"./Drivers/VL53L7CX_ULD/Src/vl53l7cx_api.o"
+"./ToF/claritone_tof_test.o"
+"./ToF/platform.o"
