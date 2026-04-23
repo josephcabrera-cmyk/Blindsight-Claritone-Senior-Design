@@ -63,8 +63,8 @@ all: main-build
 main-build: Claritone_L2_GPIO_FSBL.elf secondary-outputs
 
 # Tool invocations
-Claritone_L2_GPIO_FSBL.elf Claritone_L2_GPIO_FSBL.map: $(OBJS) $(USER_OBJS) C:\Users\Thepr\STM32Projects\Claritone_L2_GPIO\FSBL\STM32N657X0HXQ_AXISRAM2_fsbl.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Claritone_L2_GPIO_FSBL.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m55 -T"C:\Users\Thepr\STM32Projects\Claritone_L2_GPIO\FSBL\STM32N657X0HXQ_AXISRAM2_fsbl.ld" --specs=nosys.specs -Wl,-Map="Claritone_L2_GPIO_FSBL.map" -Wl,--gc-sections -static -Wl,--cmse-implib -Wl,--out-implib=./secure_nsclib.o --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Claritone_L2_GPIO_FSBL.elf Claritone_L2_GPIO_FSBL.map: $(OBJS) $(USER_OBJS) C:\Users\Thepr\STM32Projects\Blindsight-Claritone-Senior-Design\Firmware\Claritone_L2_GPIO\FSBL\STM32N657X0HXQ_AXISRAM2_fsbl.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Claritone_L2_GPIO_FSBL.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m55 -T"C:\Users\Thepr\STM32Projects\Blindsight-Claritone-Senior-Design\Firmware\Claritone_L2_GPIO\FSBL\STM32N657X0HXQ_AXISRAM2_fsbl.ld" --specs=nosys.specs -Wl,-Map="Claritone_L2_GPIO_FSBL.map" -Wl,--gc-sections -static -Wl,--cmse-implib -Wl,--out-implib=./secure_nsclib.o --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
