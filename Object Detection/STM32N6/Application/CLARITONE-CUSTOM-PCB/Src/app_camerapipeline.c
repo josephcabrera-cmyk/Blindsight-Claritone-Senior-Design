@@ -20,6 +20,7 @@
 #define CAMERA_HEIGHT 0
 
 extern int32_t cameraFrameReceived;
+extern uint32_t claritone_frame_callback_count;
 
 static void CameraPipeline_Fail(const char *message, int code)
 {
@@ -175,7 +176,14 @@ int CMW_CAMERA_PIPE_FrameEventCallback(uint32_t pipe)
 {
   if (pipe == DCMIPP_PIPE2)
   {
+    claritone_frame_callback_count++;
     cameraFrameReceived++;
+    if ((claritone_frame_callback_count <= 5U) || ((claritone_frame_callback_count % 30U) == 0U))
+    {
+      printf("FRAME EVENT: pipe=%lu count=%lu\r\n",
+             (unsigned long)pipe,
+             (unsigned long)claritone_frame_callback_count);
+    }
   }
 
   return 0;

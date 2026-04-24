@@ -71,6 +71,7 @@ typedef struct
 UART_HandleTypeDef huart_console;
 volatile int32_t cameraFrameReceived;
 volatile uint32_t claritone_boot_stage;
+volatile uint32_t claritone_frame_callback_count;
 stai_ptr nn_in;
 od_pp_out_t pp_output;
 
@@ -160,16 +161,30 @@ int main(void)
   while (1)
   {
     CameraPipeline_IspUpdate();
+    Claritone_BootLog("BOOT 40: arming NN pipe\r\n");
 
 #if DCMIPP_NN_NEEDS_CROP
     CameraPipeline_NNPipe_Start(dcmipp_out_nn, CMW_MODE_SNAPSHOT);
 #else
     CameraPipeline_NNPipe_Start(nn_in, CMW_MODE_SNAPSHOT);
 #endif
+    Claritone_BootLog("BOOT 41: NN pipe armed\r\n");
 
+    uint32_t wait_start = HAL_GetTick();
     while (cameraFrameReceived == 0)
     {
+      if ((HAL_GetTick() - wait_start) > 2000U)
+      {
+        printf("FRAME TIMEOUT: callbacks=%lu DCMIPP_P2SR=0x%08lX DCMIPP_P2IER=0x%08lX CSI_SR0=0x%08lX CSI_SR1=0x%08lX\r\n",
+               (unsigned long)claritone_frame_callback_count,
+               (unsigned long)CMW_CAMERA_GetDCMIPPHandle()->Instance->P2SR,
+               (unsigned long)CMW_CAMERA_GetDCMIPPHandle()->Instance->P2IER,
+               (unsigned long)CSI->SR0,
+               (unsigned long)CSI->SR1);
+        wait_start = HAL_GetTick();
+      }
     }
+    Claritone_BootLog("BOOT 42: frame received\r\n");
     cameraFrameReceived = 0;
 
     uint32_t ts[2] = {0};
@@ -180,13 +195,20 @@ int main(void)
     SCB_CleanInvalidateDCache_by_Addr(nn_in, nn_in_len);
 #endif
 
+    claritone_boot_stage = 0x50;
+    Claritone_BootLog("BOOT 50: stai_network_run start\r\n");
     ts[0] = HAL_GetTick();
     ret = stai_network_run(network_context, STAI_MODE_SYNC);
-    assert(ret == 0);
     ts[1] = HAL_GetTick();
-
-    ret = app_postprocess_run((void **)nn_out, number_output, &pp_output, &pp_params);
+    printf("BOOT 51: stai_network_run ret=%ld\r\n", (long)ret);
     assert(ret == 0);
+
+    claritone_boot_stage = 0x52;
+    Claritone_BootLog("BOOT 52: postprocess start\r\n");
+    ret = app_postprocess_run((void **)nn_out, number_output, &pp_output, &pp_params);
+    printf("BOOT 53: postprocess ret=%ld\r\n", (long)ret);
+    assert(ret == 0);
+    claritone_boot_stage = 0x54;
 
     Claritone_HandleFrame(&pp_output);
     printf("INFERENCE: %lums objects=%lu\r\n",

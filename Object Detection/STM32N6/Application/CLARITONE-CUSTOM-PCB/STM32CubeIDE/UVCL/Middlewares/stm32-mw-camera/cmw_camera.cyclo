@@ -1,6 +1,6 @@
+C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Object Detection/STM32N6/Middlewares/stm32-mw-camera/cmw_camera.c:1092:13:CMW_CAMERA_EnablePin	1
 C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Object Detection/STM32N6/Middlewares/stm32-mw-camera/cmw_camera.c:146:13:CMW_CAMERA_DebugLog	1
 C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Object Detection/STM32N6/Middlewares/stm32-mw-camera/cmw_camera.c:151:13:CMW_CAMERA_DebugLogRet	1
-C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Object Detection/STM32N6/Middlewares/stm32-mw-camera/cmw_camera.c:1092:13:CMW_CAMERA_EnablePin	1
 C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Object Detection/STM32N6/Middlewares/stm32-mw-camera/cmw_camera.c:1087:13:CMW_CAMERA_ShutdownPin	1
 C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Object Detection/STM32N6/Middlewares/stm32-mw-camera/cmw_camera.c:1021:13:CMW_CAMERA_EnableGPIOs	1
 C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Object Detection/STM32N6/Middlewares/stm32-mw-camera/cmw_camera.c:1146:16:CMW_CAMERA_VD55G1_Init	14

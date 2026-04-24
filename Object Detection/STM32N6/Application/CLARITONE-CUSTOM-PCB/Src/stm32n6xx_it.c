@@ -17,10 +17,35 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
 #include "stm32n6xx_hal.h"
 #include "stm32n6xx_it.h"
 
 #include "cmw_camera.h"
+
+extern UART_HandleTypeDef huart_console;
+extern volatile uint32_t claritone_boot_stage;
+
+static void Claritone_FaultLog(const char *name)
+{
+  char buffer[192];
+  int len;
+
+  len = snprintf(buffer, sizeof(buffer),
+                 "\r\nFAULT: %s boot=0x%02lX CFSR=0x%08lX HFSR=0x%08lX BFAR=0x%08lX MMFAR=0x%08lX\r\n",
+                 name,
+                 (unsigned long)claritone_boot_stage,
+                 (unsigned long)SCB->CFSR,
+                 (unsigned long)SCB->HFSR,
+                 (unsigned long)SCB->BFAR,
+                 (unsigned long)SCB->MMFAR);
+
+  if ((len > 0) && (huart_console.Instance != NULL))
+  {
+    uint16_t tx_len = (uint16_t)((len < (int)sizeof(buffer)) ? len : ((int)sizeof(buffer) - 1));
+    (void)HAL_UART_Transmit(&huart_console, (uint8_t *)buffer, tx_len, 1000U);
+  }
+}
 
 /**
   * @brief   This function handles NMI exception.
@@ -38,6 +63,7 @@ void NMI_Handler(void)
   */
 void HardFault_Handler(void)
 {
+  Claritone_FaultLog("HardFault");
   /* Go to infinite loop when Hard Fault exception occurs */
   while (1)
   {
@@ -51,6 +77,7 @@ void HardFault_Handler(void)
   */
 void MemManage_Handler(void)
 {
+  Claritone_FaultLog("MemManage");
   /* Go to infinite loop when Memory Manage exception occurs */
   while (1)
   {
@@ -64,6 +91,7 @@ void MemManage_Handler(void)
   */
 void BusFault_Handler(void)
 {
+  Claritone_FaultLog("BusFault");
   /* Go to infinite loop when Bus Fault exception occurs */
   while (1)
   {
@@ -77,6 +105,7 @@ void BusFault_Handler(void)
   */
 void UsageFault_Handler(void)
 {
+  Claritone_FaultLog("UsageFault");
   /* Go to infinite loop when Usage Fault exception occurs */
   while (1)
   {
@@ -90,6 +119,7 @@ void UsageFault_Handler(void)
   */
 void SecureFault_Handler(void)
 {
+  Claritone_FaultLog("SecureFault");
   /* Go to infinite loop when Secure Fault exception occurs */
   while (1)
   {

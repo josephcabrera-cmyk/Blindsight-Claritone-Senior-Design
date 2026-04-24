@@ -28,6 +28,8 @@ extern "C" {
 #include "stm32n6xx_hal.h"
 #include "stm32n6xx_nucleo_bus.h"
 
+/* Custom Claritone PCB board selection for middleware camera IO mapping. */
+#define CLARITONE_CUSTOM_PCB
 
 /* ########################## Module Selection ############################## */
 /**
