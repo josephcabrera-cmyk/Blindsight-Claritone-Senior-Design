@@ -28,6 +28,16 @@ static volatile int16_t g_user_volume_q15 = 32767;
 static volatile uint8_t g_muted = 0;
 
 typedef enum {
+    TONE_PURE = 0,    /* 220-1320 Hz */
+    TONE_LOW,         /* 110-660 Hz  */
+    TONE_HIGH,        /* 440-2640 Hz */
+    TONE_COUNT
+} tone_preset_t;
+
+static const char *tone_name[TONE_COUNT] = { "PURE", "LOW", "HIGH" };
+static volatile tone_preset_t g_tone_preset = TONE_PURE;
+
+typedef enum {
     SENS_CLOSE = 0,
     SENS_MEDIUM,
     SENS_FAR,
@@ -53,6 +63,27 @@ static void sine_lut_init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+static uint8_t btn_tone_check_press(void)
+{
+    static uint8_t debounce_count = 0;
+    static uint8_t armed = 1;
+
+    uint8_t raw = (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_4) == GPIO_PIN_RESET) ? 0 : 1;
+
+    if (raw == 0) {
+        if (debounce_count < 3) debounce_count++;
+    } else {
+        debounce_count = 0;
+        armed = 1;
+    }
+
+    if (debounce_count >= 3 && armed) {
+        armed = 0;
+        return 1;
+    }
+    return 0;
+}
+
 static int8_t scroll_wheel_poll(void)
 {
     static uint8_t last_a = 1;
@@ -180,6 +211,14 @@ int main(void)
             sens_name[g_sens_mode], sens_max_mm[g_sens_mode]);
         HAL_UART_Transmit(&huart4, (const uint8_t *)msg, len, 10);
     }
+
+    if (btn_tone_check_press()) {
+            g_tone_preset = (g_tone_preset + 1) % TONE_COUNT;
+            char msg[48];
+            int len = snprintf(msg, sizeof(msg),
+                ">>> Tone: %s\r\n", tone_name[g_tone_preset]);
+            HAL_UART_Transmit(&huart4, (const uint8_t *)msg, len, 10);
+        }
 
     int8_t scroll = scroll_wheel_poll();
         if (scroll != 0) {
@@ -315,12 +354,15 @@ static void fill_frames(uint32_t word_offset)
 
     /* Avoid uint64 in ISR. Precompute scale: SINE_LUT_SIZE * 65536 / 48000 = 256 * 65536 / 48000 = 349.5
      * Use (freq_hz * 349) which gives same result within rounding for our range. */
-    uint32_t freq_hz = 220u + ((uint32_t)vol * 1100u) / 32767u;
-    /* Q16 fixed-point: 349.525... * 65536 = 22906471.
-     * inc = (freq_hz * 22906471) >> 16
-     * Multiply fits in uint32: max freq_hz=1320 * 22906471 = 3.02 * 10^10 -- DOES NOT FIT in 32-bit!
-     * Need uint64 for the multiply but no division. */
-    uint32_t inc = (freq_hz * 5594u) >> 4;
+    /* Per-preset frequency range */
+        uint32_t base_hz, range_hz;
+        tone_preset_t preset = g_tone_preset;
+        if (preset == TONE_LOW)       { base_hz = 110u;  range_hz = 550u;  }
+        else if (preset == TONE_HIGH) { base_hz = 440u;  range_hz = 2200u; }
+        else                          { base_hz = 220u;  range_hz = 1100u; }
+
+        uint32_t freq_hz = base_hz + ((uint32_t)vol * range_hz) / 32767u;
+        uint32_t inc = (freq_hz * 5594u) >> 4;
 
     for (int i = 0; i < HALF_FRAMES; ++i) {
         uint32_t idx = (phase & mask) >> 16;
