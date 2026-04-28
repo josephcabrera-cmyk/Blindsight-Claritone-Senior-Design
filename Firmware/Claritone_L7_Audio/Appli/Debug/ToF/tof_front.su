@@ -1,4 +1,10 @@
-../ToF/tof_front.c:11:23:zone_valid	16	static
-../ToF/tof_front.c:15:13:sensor_power_on	8	static
-../ToF/tof_front.c:23:9:ToF_Front_Init	16	static
-../ToF/tof_front.c:46:9:ToF_Front_Poll	1416	static
+../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_bus.h:1407:22:LL_AHB4_GRP1_EnableClock	24	static
+../ToF/tof_front.c:28:23:zone_valid	16	static
+../ToF/tof_front.c:37:13:init_gpiof_pins	32	static
+../ToF/tof_front.c:49:13:all_lpn_low	8	static
+../ToF/tof_front.c:57:13:sensor_reset_pulse	8	static
+../ToF/tof_front.c:71:16:bring_up_sensor	24	static
+../ToF/tof_front.c:104:9:ToF_Array_Init	8	static
+../ToF/tof_front.c:127:9:ToF_Array_Poll	1400	static
+../ToF/tof_front.c:173:9:ToF_Front_Init	16	static
+../ToF/tof_front.c:180:9:ToF_Front_Poll	32	static

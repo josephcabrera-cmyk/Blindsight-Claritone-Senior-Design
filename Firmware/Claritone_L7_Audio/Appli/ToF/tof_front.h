@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 
-/* 4 sensors: index by direction */
+/* ===========================================================
+ * Multi-sensor API (use when multi-sensor mode is active)
+ * =========================================================== */
 typedef enum {
     TOF_IDX_FRONT = 0,
     TOF_IDX_LEFT  = 1,
@@ -13,33 +15,27 @@ typedef enum {
 } tof_idx_t;
 
 typedef struct {
-    uint16_t distance_mm[TOF_COUNT];   /* 0 = invalid / out of range */
-    uint8_t  valid[TOF_COUNT];         /* 1 = sensor present and target detected */
-    uint8_t  online[TOF_COUNT];        /* 1 = sensor responded at init time */
+    uint16_t distance_mm[TOF_COUNT];
+    uint8_t  valid[TOF_COUNT];
+    uint8_t  online[TOF_COUNT];   /* 1 = sensor came online at init */
 } tof_array_state_t;
 
-/**
- * @brief Init all 4 ToF sensors. Skips any that don't respond (online=0).
- *        Always succeeds — caller can demo with whatever sensors are present.
- * @retval Number of sensors that came online (0-4).
- */
+/* Init all 4 sensors. Skips ones that don't respond. Returns count online. */
 uint8_t ToF_Array_Init(void);
 
-/**
- * @brief Non-blocking poll. Updates *out for each online sensor that has new data.
- *        Sensors offline at init are skipped permanently.
- * @retval Bitmask of sensors updated this call.
- */
+/* Poll all online sensors. Returns bitmask of sensors with new data. */
 uint8_t ToF_Array_Poll(tof_array_state_t *out);
 
-/* Legacy API kept for back-compat — wraps front sensor. */
+/* ===========================================================
+ * Legacy single-sensor API (front sensor only, back-compat)
+ * =========================================================== */
 typedef struct {
     uint16_t distance_mm;
     int16_t  azimuth_q15;
     uint8_t  valid;
 } tof_front_state_t;
 
-uint8_t ToF_Front_Init(void);   /* now calls ToF_Array_Init */
+uint8_t ToF_Front_Init(void);
 uint8_t ToF_Front_Poll(tof_front_state_t *out);
 
 #endif

@@ -182,15 +182,6 @@ int main(void)
     }
 
     int8_t scroll = scroll_wheel_poll();
-    static uint32_t scroll_dbg = 0;
-        if (++scroll_dbg >= 50) {
-            scroll_dbg = 0;
-            uint8_t a = (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_8) == GPIO_PIN_SET) ? 1 : 0;
-            uint8_t b = (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == GPIO_PIN_SET) ? 1 : 0;
-            char m[32];
-            int ml = snprintf(m, sizeof(m), "[scroll a=%u b=%u]\r\n", a, b);
-            HAL_UART_Transmit(&huart4, (const uint8_t*)m, ml, 10);
-        }
         if (scroll != 0) {
             int32_t vu = g_user_volume_q15 + (scroll * 4096);
             if (vu < 0)     vu = 0;
