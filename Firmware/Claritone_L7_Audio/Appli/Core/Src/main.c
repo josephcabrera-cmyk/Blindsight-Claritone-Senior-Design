@@ -23,6 +23,8 @@
 extern DMA_HandleTypeDef handle_GPDMA1_Channel0;
 
 /* USER CODE BEGIN PV */
+volatile int16_t g_pan_q15 = 0;        /* -32768 = full left, 0 = center, +32767 = full right */
+
 static volatile int16_t g_user_volume_q15 = 32767;
 
 static volatile uint8_t g_muted = 0;
@@ -60,6 +62,7 @@ static void SystemIsolation_Config(void);
 
 /* USER CODE BEGIN PFP */
 static void sine_lut_init(void);
+static void pan_lut_init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -169,6 +172,7 @@ int main(void)
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
 
   sine_lut_init();
+  pan_lut_init();
 
   /* Boot banner --- multi-section, each ≤96 bytes for stack safety */
     {
@@ -380,6 +384,10 @@ volatile uint32_t sai_err_count = 0;
 static int32_t sine_lut[SINE_LUT_SIZE];
 static uint32_t s_phase_q = 0;
 
+#define PAN_LUT_SIZE 512u
+static uint16_t pan_gain_l[PAN_LUT_SIZE];
+static uint16_t pan_gain_r[PAN_LUT_SIZE];
+
 static void sine_lut_init(void)
 {
     const float twoPi = 2.0f * 3.1415926535f;
@@ -388,6 +396,30 @@ static void sine_lut_init(void)
         sine_lut[i] = (int32_t)(0x7FFFFFFF * 0.6f * s);
     }
     s_phase_q = 0;
+}
+
+static void pan_lut_init(void)
+{
+    /* Equal-power panning with head-shadow attenuation.
+     * Index i (0..511) maps to pan = (i/256.0) - 1.0 in range [-1, +1).
+     *
+     * gL = sqrt(0.5 * (1 - pan))   <- left ear gain
+     * gR = sqrt(0.5 * (1 + pan))   <- right ear gain
+     *
+     * Head shadow: reduce far-ear gain by (1 - 0.25*|pan|).
+     * Stored as uint16 Q15 (0 = mute, 32767 = unity). */
+    for (uint32_t i = 0; i < PAN_LUT_SIZE; ++i) {
+        float pan = ((float)i / 256.0f) - 1.0f;
+        float gL = sqrtf(0.5f * (1.0f - pan));
+        float gR = sqrtf(0.5f * (1.0f + pan));
+        float shadow = 1.0f - 0.25f * fabsf(pan);
+        if (pan > 0.0f) gL *= shadow;       /* user looking right -> left ear is "far" */
+        else            gR *= shadow;
+        if (gL > 1.0f) gL = 1.0f;
+        if (gR > 1.0f) gR = 1.0f;
+        pan_gain_l[i] = (uint16_t)(gL * 32767.0f);
+        pan_gain_r[i] = (uint16_t)(gR * 32767.0f);
+    }
 }
 
 static void fill_frames(uint32_t word_offset)
@@ -411,14 +443,28 @@ static void fill_frames(uint32_t word_offset)
         uint32_t freq_hz = base_hz + ((uint32_t)vol * range_hz) / 32767u;
         uint32_t inc = (freq_hz * 5594u) >> 4;
 
-    for (int i = 0; i < HALF_FRAMES; ++i) {
-        uint32_t idx = (phase & mask) >> 16;
-        int32_t s = sine_lut[idx];
-        int32_t out = (int32_t)(((int64_t)s * vol) >> 15);
-        audioBuffer[word_offset + 2*i + 0] = out;
-        audioBuffer[word_offset + 2*i + 1] = out;
-        phase += inc;
-    }
+        /* Snapshot pan once -- volatile read; apply LUT -> Q15 gains. */
+           int32_t pan = g_pan_q15;
+           if (pan < -32768) pan = -32768;
+           if (pan >  32767) pan =  32767;
+           uint32_t pan_idx = ((uint32_t)(pan + 32768)) >> 7;   /* 0..511 */
+           if (pan_idx >= PAN_LUT_SIZE) pan_idx = PAN_LUT_SIZE - 1;
+           int32_t gL = pan_gain_l[pan_idx];
+           int32_t gR = pan_gain_r[pan_idx];
+
+           for (int i = 0; i < HALF_FRAMES; ++i) {
+               uint32_t idx = (phase & mask) >> 16;
+               int32_t s = sine_lut[idx];
+               int32_t mono = (int32_t)(((int64_t)s * vol) >> 15);
+
+               /* Apply L/R pan gains */
+               int32_t outL = (int32_t)(((int64_t)mono * gL) >> 15);
+               int32_t outR = (int32_t)(((int64_t)mono * gR) >> 15);
+
+               audioBuffer[word_offset + 2*i + 0] = outL;
+               audioBuffer[word_offset + 2*i + 1] = outR;
+               phase += inc;
+           }
 
     s_phase_q = phase;
 }
