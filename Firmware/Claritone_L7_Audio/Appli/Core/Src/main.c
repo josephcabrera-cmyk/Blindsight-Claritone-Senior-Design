@@ -320,12 +320,13 @@ int main(void)
                 * Same vol curve drives it: high vol -> short period (fast pulse). */
                s_beat_period_ms = 700 - ((uint32_t)vol * 550u) / 32767u;
 
-               char msg[80];
+               char msg[96];
                int len = snprintf(msg, sizeof(msg),
-                   "ToF: %u mm  vol=%d  beat=%lums  [%s]\r\n",
+                   "ToF: %u mm  vol=%d  beat=%lums  [%s/%s]\r\n",
                    st.distance_mm, (int)vol,
                    (unsigned long)s_beat_period_ms,
-                   sens_name[g_sens_mode]);
+                   sens_name[g_sens_mode],
+                   tone_name[g_tone_preset]);
                HAL_UART_Transmit(&huart4, (const uint8_t *)msg, len, 10);
            } else {
                s_target_vol = 0;

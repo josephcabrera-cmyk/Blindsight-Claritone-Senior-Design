@@ -32,7 +32,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_uart_ex.h \
  ../Core/Inc/gpdma.h ../Core/Inc/main.h ../Core/Inc/sai.h \
  ../Core/Inc/usart.h ../Core/Inc/gpio.h \
- C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L7_Audio/Appli/ToF/tof_front.h
+ C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L7_Audio/Appli/ToF/tof_front.h
 ../Core/Inc/main.h:
 ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal.h:
 ../Core/Inc/stm32n6xx_hal_conf.h:
@@ -70,4 +70,4 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/sai.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/gpio.h:
-C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L7_Audio/Appli/ToF/tof_front.h:
+C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L7_Audio/Appli/ToF/tof_front.h:

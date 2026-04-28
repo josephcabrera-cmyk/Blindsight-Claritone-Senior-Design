@@ -30,7 +30,7 @@ ToF/tof_front.o: ../ToF/tof_front.c ../ToF/tof_front.h ../ToF/platform.h \
  ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_sai_ex.h \
  ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_uart.h \
  ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_uart_ex.h \
- C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L7_Audio/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_api.h \
+ C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L7_Audio/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_api.h \
  ../Core/Inc/i2c_bb.h ../Core/Inc/main.h
 ../ToF/tof_front.h:
 ../ToF/platform.h:
@@ -65,6 +65,6 @@ ToF/tof_front.o: ../ToF/tof_front.c ../ToF/tof_front.h ../ToF/platform.h \
 ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_sai_ex.h:
 ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_uart.h:
 ../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_hal_uart_ex.h:
-C:/Users/Thepr/STM32Projects/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L7_Audio/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_api.h:
+C:/Users/Thepr/Blindsight-Claritone-Senior-Design/Firmware/Claritone_L7_Audio/Appli/Drivers/VL53L7CX_ULD/Inc/vl53l7cx_api.h:
 ../Core/Inc/i2c_bb.h:
 ../Core/Inc/main.h:
