@@ -50,7 +50,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, TOF_LPN_Pin|SCROLL_1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(TOF_LPN_GPIO_Port, TOF_LPN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, SDA_BB_Pin|SCL_BB_Pin, GPIO_PIN_RESET);
@@ -61,18 +61,24 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
 
+  /*Configure GPIO pins : SCROLL_2_Pin SCROLL_NO_Pin */
+  GPIO_InitStruct.Pin = SCROLL_2_Pin|SCROLL_NO_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
   /*Configure GPIO pins : BTN_TONE_Pin BTN_SENS_Pin */
   GPIO_InitStruct.Pin = BTN_TONE_Pin|BTN_SENS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : TOF_LPN_Pin SCROLL_1_Pin */
-  GPIO_InitStruct.Pin = TOF_LPN_Pin|SCROLL_1_Pin;
+  /*Configure GPIO pin : TOF_LPN_Pin */
+  GPIO_InitStruct.Pin = TOF_LPN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  HAL_GPIO_Init(TOF_LPN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : SDA_BB_Pin SCL_BB_Pin */
   GPIO_InitStruct.Pin = SDA_BB_Pin|SCL_BB_Pin;
@@ -80,6 +86,12 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SCROLL_1_Pin */
+  GPIO_InitStruct.Pin = SCROLL_1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(SCROLL_1_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : TOF_INT_Pin TOF_I2C_RST_Pin */
   GPIO_InitStruct.Pin = TOF_INT_Pin|TOF_I2C_RST_Pin;

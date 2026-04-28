@@ -23,6 +23,10 @@
 extern DMA_HandleTypeDef handle_GPDMA1_Channel0;
 
 /* USER CODE BEGIN PV */
+static volatile int16_t g_user_volume_q15 = 32767;
+
+static volatile uint8_t g_muted = 0;
+
 typedef enum {
     SENS_CLOSE = 0,
     SENS_MEDIUM,
@@ -49,6 +53,44 @@ static void sine_lut_init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+static int8_t scroll_wheel_poll(void)
+{
+    static uint8_t last_a = 1;
+    static uint8_t last_b = 1;
+    uint8_t a = (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_8) == GPIO_PIN_SET) ? 1 : 0;
+    uint8_t b = (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == GPIO_PIN_SET) ? 1 : 0;
+
+    int8_t result = 0;
+    /* Falling edge on A = +1 (right), falling edge on B = -1 (left) */
+    if (a == 0 && last_a == 1)      result = +1;
+    else if (b == 0 && last_b == 1) result = -1;
+
+    last_a = a;
+    last_b = b;
+    return result;
+}
+
+static uint8_t scroll_button_check_press(void)
+{
+    static uint8_t debounce_count = 0;
+    static uint8_t armed = 1;
+
+    uint8_t raw = (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2) == GPIO_PIN_RESET) ? 0 : 1;
+
+    if (raw == 0) {
+        if (debounce_count < 3) debounce_count++;
+    } else {
+        debounce_count = 0;
+        armed = 1;
+    }
+
+    if (debounce_count >= 3 && armed) {
+        armed = 0;
+        return 1;
+    }
+    return 0;
+}
+
 static uint8_t btn_sens_check_press(void)
 {
     static uint8_t debounce_count = 0;
@@ -97,6 +139,16 @@ int main(void)
 
   sine_lut_init();
 
+  {
+      const char *banner =
+          "\r\n"
+          "=== Claritone Wearable Navigation ===\r\n"
+          "ESE441 Senior Design Spring 2026\r\n"
+          "\r\n";
+      HAL_UART_Transmit(&huart4, (const uint8_t *)banner,
+          strlen(banner), HAL_MAX_DELAY);
+  }
+
   memset(audioBuffer, 0, sizeof(audioBuffer));
   if (HAL_SAI_Transmit_DMA(&hsai_BlockA1, (uint8_t*)audioBuffer, 2*TOTAL_FRAMES) != HAL_OK)
   {
@@ -129,26 +181,87 @@ int main(void)
         HAL_UART_Transmit(&huart4, (const uint8_t *)msg, len, 10);
     }
 
-    tof_front_state_t st;
-    if (ToF_Front_Poll(&st)) {
-        if (st.valid) {
-            int32_t d = st.distance_mm;
-            int32_t max_mm = sens_max_mm[g_sens_mode];
-            int32_t vol;
-            if (d < 50)            vol = 32767;
-            else if (d > max_mm)   vol = 0;
-            else                   vol = (int32_t)(32767L * (max_mm - d) / (max_mm - 50));
-            g_volume_q15 = (int16_t)vol;
-
-            char msg[64];
-            int len = snprintf(msg, sizeof(msg),
-                "ToF: %u mm  vol=%d  [%s]\r\n",
-                st.distance_mm, (int)g_volume_q15, sens_name[g_sens_mode]);
-            HAL_UART_Transmit(&huart4, (const uint8_t *)msg, len, 10);
-        } else {
-            g_volume_q15 = 0;
+    int8_t scroll = scroll_wheel_poll();
+    static uint32_t scroll_dbg = 0;
+        if (++scroll_dbg >= 50) {
+            scroll_dbg = 0;
+            uint8_t a = (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_8) == GPIO_PIN_SET) ? 1 : 0;
+            uint8_t b = (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == GPIO_PIN_SET) ? 1 : 0;
+            char m[32];
+            int ml = snprintf(m, sizeof(m), "[scroll a=%u b=%u]\r\n", a, b);
+            HAL_UART_Transmit(&huart4, (const uint8_t*)m, ml, 10);
         }
-    }
+        if (scroll != 0) {
+            int32_t vu = g_user_volume_q15 + (scroll * 4096);
+            if (vu < 0)     vu = 0;
+            if (vu > 32767) vu = 32767;
+            g_user_volume_q15 = (int16_t)vu;
+
+            char msg[48];
+            int len = snprintf(msg, sizeof(msg),
+                ">>> Volume: %d/32767\r\n", (int)g_user_volume_q15);
+            HAL_UART_Transmit(&huart4, (const uint8_t *)msg, len, 10);
+        }
+
+        /* NEW: mute button check goes here */
+           if (scroll_button_check_press()) {
+               g_muted = !g_muted;
+               const char *m = g_muted ? ">>> MUTED\r\n" : ">>> UNMUTED\r\n";
+               HAL_UART_Transmit(&huart4, (const uint8_t *)m, strlen(m), 10);
+           }
+
+    /* These two persist across iterations -- declared static here for locality. */
+       static int32_t  s_target_vol     = 0;       /* volume during ON half of beat */
+       static uint32_t s_beat_period_ms = 1000;    /* current beat period (slow default) */
+
+       tof_front_state_t st;
+       if (ToF_Front_Poll(&st)) {
+           if (st.valid) {
+               int32_t d = st.distance_mm;
+               int32_t max_mm = sens_max_mm[g_sens_mode];
+               int32_t vol;
+               if (d < 50)            vol = 32767;
+               else if (d > max_mm)   vol = 0;
+               else                   vol = (int32_t)(32767L * (max_mm - d) / (max_mm - 50));
+
+               vol = (vol / 2048) * 2048;
+                           if (vol > 32767) vol = 32767;
+
+                           /* Apply user volume scale */
+                                       vol = (int32_t)(((int64_t)vol * g_user_volume_q15) >> 15);
+
+                                       /* Apply mute */
+                                       if (g_muted) vol = 0;
+
+                                       s_target_vol = vol;
+
+               /* Beat period from distance: close = 150ms, far = 700ms.
+                * Same vol curve drives it: high vol -> short period (fast pulse). */
+               s_beat_period_ms = 700 - ((uint32_t)vol * 550u) / 32767u;
+
+               char msg[80];
+               int len = snprintf(msg, sizeof(msg),
+                   "ToF: %u mm  vol=%d  beat=%lums  [%s]\r\n",
+                   st.distance_mm, (int)vol,
+                   (unsigned long)s_beat_period_ms,
+                   sens_name[g_sens_mode]);
+               HAL_UART_Transmit(&huart4, (const uint8_t *)msg, len, 10);
+           } else {
+               s_target_vol = 0;
+           }
+       }
+
+       /* Beat gating -- runs every loop iteration, not just on ToF poll. */
+       if (s_target_vol == 0) {
+           g_volume_q15 = 0;
+       } else {
+           uint32_t phase = HAL_GetTick() % s_beat_period_ms;
+           if (phase < (s_beat_period_ms / 2)) {
+               g_volume_q15 = (int16_t)s_target_vol;
+           } else {
+               g_volume_q15 = 0;
+           }
+       }
     HAL_Delay(10);
     /* USER CODE END 3 */
   }
@@ -195,7 +308,7 @@ static void sine_lut_init(void)
     const float twoPi = 2.0f * 3.1415926535f;
     for (uint32_t i = 0; i < SINE_LUT_SIZE; ++i) {
         float s = sinf(twoPi * (float)i / (float)SINE_LUT_SIZE);
-        sine_lut[i] = (int32_t)(0x7FFFFFFF * 0.9f * s);
+        sine_lut[i] = (int32_t)(0x7FFFFFFF * 0.6f * s);
     }
     s_phase_q = 0;
 }
@@ -209,9 +322,14 @@ static void fill_frames(uint32_t word_offset)
     if (vol < 0) vol = 0;
     if (vol > 32767) vol = 32767;
 
-    /* Pitch follows volume: 220 Hz quiet -> 1320 Hz close */
+    /* Avoid uint64 in ISR. Precompute scale: SINE_LUT_SIZE * 65536 / 48000 = 256 * 65536 / 48000 = 349.5
+     * Use (freq_hz * 349) which gives same result within rounding for our range. */
     uint32_t freq_hz = 220u + ((uint32_t)vol * 1100u) / 32767u;
-    uint32_t inc = (uint32_t)(((uint64_t)freq_hz * SINE_LUT_SIZE * 65536u) / 48000u);
+    /* Q16 fixed-point: 349.525... * 65536 = 22906471.
+     * inc = (freq_hz * 22906471) >> 16
+     * Multiply fits in uint32: max freq_hz=1320 * 22906471 = 3.02 * 10^10 -- DOES NOT FIT in 32-bit!
+     * Need uint64 for the multiply but no division. */
+    uint32_t inc = (freq_hz * 5594u) >> 4;
 
     for (int i = 0; i < HALF_FRAMES; ++i) {
         uint32_t idx = (phase & mask) >> 16;

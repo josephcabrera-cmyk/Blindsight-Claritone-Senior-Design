@@ -75,12 +75,16 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define SCROLL_2_Pin GPIO_PIN_1
+#define SCROLL_2_GPIO_Port GPIOC
 #define BTN_TONE_Pin GPIO_PIN_4
 #define BTN_TONE_GPIO_Port GPIOC
 #define TOF_LPN_Pin GPIO_PIN_1
 #define TOF_LPN_GPIO_Port GPIOD
 #define BTN_SENS_Pin GPIO_PIN_6
 #define BTN_SENS_GPIO_Port GPIOC
+#define SCROLL_NO_Pin GPIO_PIN_2
+#define SCROLL_NO_GPIO_Port GPIOC
 #define SDA_BB_Pin GPIO_PIN_9
 #define SDA_BB_GPIO_Port GPIOB
 #define SCL_BB_Pin GPIO_PIN_8
