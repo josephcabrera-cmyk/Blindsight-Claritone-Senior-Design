@@ -170,15 +170,37 @@ int main(void)
 
   sine_lut_init();
 
-  {
-      const char *banner =
-          "\r\n"
-          "=== Claritone Wearable Navigation ===\r\n"
-          "ESE441 Senior Design Spring 2026\r\n"
-          "\r\n";
-      HAL_UART_Transmit(&huart4, (const uint8_t *)banner,
-          strlen(banner), HAL_MAX_DELAY);
-  }
+  /* Boot banner --- multi-section, each ≤96 bytes for stack safety */
+    {
+        const char *line;
+
+        line = "\r\n"
+               "==========================================\r\n";
+        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+
+        line = "  Claritone\r\n"
+               "  Wearable Navigation for the Visually Impaired\r\n";
+        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+
+        line = "  ESE441 Senior Design  |  Spring 2026\r\n"
+               "  Stony Brook University\r\n";
+        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+
+        line = "==========================================\r\n\r\n"
+               "System initialization:\r\n";
+        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+
+        line = "  [OK] HAL initialized\r\n"
+               "  [OK] GPDMA1 channel 0 (SAI DMA)\r\n"
+               "  [OK] UART4 (115200 8N1)\r\n"
+               "  [OK] SAI1 (48 kHz I2S stereo)\r\n";
+        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+
+        line = "  [OK] GPIO security (RIF)\r\n"
+               "  [OK] Audio amplifier enabled (PB1)\r\n"
+               "  [OK] Sine LUT (256 points)\r\n";
+        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+    }
 
   memset(audioBuffer, 0, sizeof(audioBuffer));
   if (HAL_SAI_Transmit_DMA(&hsai_BlockA1, (uint8_t*)audioBuffer, 2*TOTAL_FRAMES) != HAL_OK)
@@ -186,8 +208,12 @@ int main(void)
       Error_Handler();
   }
 
-  HAL_UART_Transmit(&huart4,
-      (const uint8_t *)"\r\nClaritone Demo - initializing front ToF...\r\n", 47, HAL_MAX_DELAY);
+  {
+        const char *line = "  Initializing front ToF (~10 sec)...\r\n";
+        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+    }
+
+    /* Start audio */
 
   uint8_t tof_status = ToF_Front_Init();
   if (tof_status != 0) {
@@ -195,8 +221,29 @@ int main(void)
       int len = snprintf(msg, sizeof(msg), "ToF init FAILED (code=%u)\r\n", tof_status);
       HAL_UART_Transmit(&huart4, (const uint8_t *)msg, len, HAL_MAX_DELAY);
   } else {
-      HAL_UART_Transmit(&huart4,
-          (const uint8_t *)"ToF ready\r\n\r\n", 13, HAL_MAX_DELAY);
+	  const char *line;
+	        line = "  [OK] Front ToF (VL53L7CX, 4x4 grid, 15 Hz)\r\n";
+	        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+
+	        line = "------------------------------------------\r\n"
+	               "  Audio   : 220-1320 Hz tone, distance modulated\r\n";
+	        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+
+	        line = "  Pitch   : closer = higher\r\n"
+	               "  Rhythm  : closer = faster pulse\r\n"
+	               "  Volume  : closer = louder\r\n";
+	        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+
+	        line = "  Controls: BTN_SENS (PC6) cycles sensitivity\r\n"
+	               "            BTN_TONE (PC4) cycles tone preset\r\n";
+	        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
+
+	        line = "            Scroll wheel sets master volume\r\n"
+	               "            Wheel press toggles mute\r\n"
+	               "==========================================\r\n"
+	               "  Ready. Wave hand near sensor for demo.\r\n"
+	               "==========================================\r\n\r\n";
+	        HAL_UART_Transmit(&huart4, (const uint8_t *)line, strlen(line), HAL_MAX_DELAY);
   }
   /* USER CODE END 2 */
 

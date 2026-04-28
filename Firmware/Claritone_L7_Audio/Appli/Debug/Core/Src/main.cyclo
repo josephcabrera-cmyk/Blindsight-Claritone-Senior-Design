@@ -5,10 +5,10 @@
 ../Core/Src/main.c:104:16:scroll_button_check_press	5
 ../Core/Src/main.c:125:16:btn_sens_check_press	5
 ../Core/Src/main.c:147:5:main	21
-../Core/Src/main.c:300:13:SystemIsolation_Config	2
-../Core/Src/main.c:336:13:sine_lut_init	2
-../Core/Src/main.c:346:13:fill_frames	6
-../Core/Src/main.c:379:6:HAL_SAI_TxHalfCpltCallback	1
-../Core/Src/main.c:386:6:HAL_SAI_TxCpltCallback	1
-../Core/Src/main.c:393:6:HAL_SAI_ErrorCallback	1
-../Core/Src/main.c:401:6:Error_Handler	1
+../Core/Src/main.c:347:13:SystemIsolation_Config	2
+../Core/Src/main.c:383:13:sine_lut_init	2
+../Core/Src/main.c:393:13:fill_frames	6
+../Core/Src/main.c:426:6:HAL_SAI_TxHalfCpltCallback	1
+../Core/Src/main.c:433:6:HAL_SAI_TxCpltCallback	1
+../Core/Src/main.c:440:6:HAL_SAI_ErrorCallback	1
+../Core/Src/main.c:448:6:Error_Handler	1
