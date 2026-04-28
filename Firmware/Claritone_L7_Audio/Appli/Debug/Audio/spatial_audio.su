@@ -1,0 +1,4 @@
+../Audio/spatial_audio.c:58:6:SpatialAudio_Init	40	static
+../Audio/spatial_audio.c:102:16:distance_to_gain_q15	24	static
+../Audio/spatial_audio.c:114:6:SpatialAudio_UpdateFromToF	80	static
+../Audio/spatial_audio.c:183:6:SpatialAudio_FillHalf	216	static

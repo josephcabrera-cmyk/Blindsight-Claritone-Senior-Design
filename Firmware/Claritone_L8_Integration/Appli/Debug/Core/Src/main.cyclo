@@ -1,0 +1,13 @@
+../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_bus.h:1165:22:LL_AHB3_GRP1_EnableClock	1
+../Core/Src/main.c:121:5:main	14
+../Core/Src/main.c:318:13:SystemClock_Config	3
+../Core/Src/main.c:362:13:sine_lut_init	2
+../Core/Src/main.c:381:13:audio_fill_half	2
+../Core/Src/main.c:399:6:HAL_SAI_TxHalfCpltCallback	1
+../Core/Src/main.c:407:6:HAL_SAI_TxCpltCallback	1
+../Core/Src/main.c:414:6:HAL_SAI_ErrorCallback	1
+../Core/Src/main.c:441:13:tof_write_reg	5
+../Core/Src/main.c:455:13:tof_read_reg	5
+../Core/Src/main.c:472:13:tof_verify_device_id	6
+../Core/Src/main.c:495:13:SystemIsolation_Config	2
+../Core/Src/main.c:528:6:Error_Handler	2

@@ -1,0 +1,4 @@
+../UI/claritone_ui.c:61:23:read_pin	16	static
+../UI/claritone_ui.c:70:6:claritone_ui_init	16	static
+../UI/claritone_ui.c:88:9:claritone_ui_poll	24	static
+../UI/claritone_ui.c:171:27:claritone_ui_get_state	4	static

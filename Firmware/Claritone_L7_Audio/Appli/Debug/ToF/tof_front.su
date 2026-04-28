@@ -1,0 +1,4 @@
+../ToF/tof_front.c:11:23:zone_valid	16	static
+../ToF/tof_front.c:15:13:sensor_power_on	8	static
+../ToF/tof_front.c:23:9:ToF_Front_Init	16	static
+../ToF/tof_front.c:46:9:ToF_Front_Poll	1416	static

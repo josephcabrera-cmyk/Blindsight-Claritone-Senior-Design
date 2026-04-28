@@ -1,0 +1,9 @@
+../Audio/claritone_audio.c:121:17:freq_to_phase_inc	1
+../Audio/claritone_audio.c:129:21:clampf	3
+../Audio/claritone_audio.c:143:13:apply_spatial_params	8
+../Audio/claritone_audio.c:207:14:distance_to_freq	6
+../Audio/claritone_audio.c:228:6:claritone_audio_init	2
+../Audio/claritone_audio.c:256:6:claritone_audio_set_volume	2
+../Audio/claritone_audio.c:262:6:claritone_audio_set_tone_preset	2
+../Audio/claritone_audio.c:268:6:claritone_audio_update	8
+../Audio/claritone_audio.c:340:6:claritone_audio_fill_half	8

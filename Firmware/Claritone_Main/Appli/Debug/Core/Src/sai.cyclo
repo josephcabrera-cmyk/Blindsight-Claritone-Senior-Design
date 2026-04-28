@@ -1,0 +1,5 @@
+../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_bus.h:2909:22:LL_APB2_GRP1_EnableClock	1
+../../Drivers/STM32N6xx_HAL_Driver/Inc/stm32n6xx_ll_bus.h:2997:22:LL_APB2_GRP1_DisableClock	1
+../Core/Src/sai.c:34:6:MX_SAI1_Init	2
+../Core/Src/sai.c:68:6:HAL_SAI_MspInit	9
+../Core/Src/sai.c:169:6:HAL_SAI_MspDeInit	3
