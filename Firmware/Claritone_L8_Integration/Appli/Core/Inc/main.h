@@ -77,6 +77,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define TOF_LPN_Pin GPIO_PIN_1
 #define TOF_LPN_GPIO_Port GPIOD
+#define BTN_SENS_Pin GPIO_PIN_6
+#define BTN_SENS_GPIO_Port GPIOC
 #define SDA_BB_Pin GPIO_PIN_9
 #define SDA_BB_GPIO_Port GPIOB
 #define SCL_BB_Pin GPIO_PIN_8
